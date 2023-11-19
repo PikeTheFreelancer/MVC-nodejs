@@ -1,14 +1,12 @@
 var db=require('../models/database');
-
+var task = require('../models/Task');
 class TaskController{
     index(req, res){
-        var sql='SELECT * FROM posts';
-      
-        db.query(sql, function (err, data, fields) {
+        task.index(function (err, data, fields) {
             res.render('index', {
                 posts: data
             });
-        });
+        })
     }
     
     create(req, res){
@@ -29,26 +27,24 @@ class TaskController{
     save(req, res) {
         var id = req.body.id;
         var title = req.body.title;
-        if (id) {
-          var sql = `update posts set title = '${title}' where id = ${id};`;
-        } else {
-          var sql = `insert into posts(title) values('${title}');`;
+        var data = {
+            id: id,
+            title: title
         }
-        db.query(sql, function (err) {
-          if (err)    console.log(err);
-          console.log("saved");
-        })
+        if (data.id) {
+          task.edit(data);
+        } else {
+          task.create(data);
+        }
         res.redirect('/');
-      }
+    }
 
     delete(req, res) {
-    var id = parseInt(req.query.id);
-    var sql=`DELETE FROM posts WHERE id = '${id}'`;
-    db.query(sql, function (err, data) {
-        if (data.affectedRows==0) {
-            alert(`post id=${id} does not exist`); 
-        }
-    });
+        var id = parseInt(req.query.id);
+        var data = {
+            id: id
+        };
+        task.delete(data);
         res.redirect('/');
     }
 
