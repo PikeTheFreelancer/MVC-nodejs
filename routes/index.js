@@ -1,61 +1,22 @@
 var express = require('express');
 var router = express.Router();
-var db=require('../models/database');
-
+var taskController = require('../controller/TaskController');
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  var sql='SELECT * FROM posts';
-  
-  db.query(sql, function (err, data, fields) {
-      res.render('index', {
-          posts: data
-      });
-  });
-});
-
-// delete item
-router.get('/delete', function(req, res) {
-  var id = parseInt(req.query.id);
-  var sql=`DELETE FROM posts WHERE id = '${id}'`;
-  db.query(sql, function (err, data) {
-    if (data.affectedRows==0) {
-      console.log(`post id=${id} does not exist`); 
-    }
-  });
-  res.redirect('/');
-})
+router.get('/', taskController.index);
 
 //add form
-router.get('/add', function(req, res) {
-  res.render('add-post')
-})
+router.get('/create', taskController.create);
+
+// delete item
+router.get('/delete', taskController.delete);
 
 //edit form
-router.get('/edit', function(req, res) {
-  var id = req.query.id;
-  var sql=`SELECT * FROM posts WHERE id = '${id}'`;
-  
-  db.query(sql, function (err, data, fields) {
-      res.render('edit', {
-          posts: data
-      });
-  });
-})
+router.get('/edit', taskController.edit);
 
 //save post
-router.post('/save', function(req, res) {
-  var id = req.body.id;
-  var title = req.body.title;
-  if (id) {
-    var sql = `update posts set title = '${title}' where id = ${id};`;
-  } else {
-    var sql = `insert into posts(title) values('${title}');`;
-  }
-  db.query(sql, function (err) {
-    if (err)    console.log(err);
-    console.log("saved");
-  })
-  res.redirect('/');
-})
+router.post('/save', taskController.save);
+
+//search tasks
+router.get('/search', taskController.search);
 
 module.exports = router;
